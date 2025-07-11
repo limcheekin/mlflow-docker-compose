@@ -44,21 +44,6 @@ services:
         volumes:
             - /home/limcheekin/docker/volumes/mlflow/wait-for-it.sh:/tmp/wait-for-it.sh
             - /home/limcheekin/docker/volumes/mlflow/mlflow-policy.json:/tmp/mlflow-policy.json
-
-    db:
-        restart: always
-        image: mysql/mysql-server
-        container_name: mlflow_db
-        #ports:
-        #    - "3306:3306"
-        environment:
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-            - MYSQL_USER=${MYSQL_USER}
-            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        volumes:
-            - dbdata:/var/lib/mysql
-
     web:
         restart: always
         build: ./mlflow
@@ -74,8 +59,8 @@ services:
             - AWS_ACCESS_KEY_ID=mlflow-user
             - AWS_SECRET_ACCESS_KEY=${MLFLOW_USER_SECRET}
             - AWS_DEFAULT_REGION=us-east-1
-            - MYSQL_DATABASE_URL=${MYSQL_DATABASE_URL:-mysql+pymysql://user:password@host:3306/db}
-        command: mlflow server --backend-store-uri ${MYSQL_DATABASE_URL} --default-artifact-root s3://mlflow/ --serve-artifacts --host 0.0.0.0
+            - DATABASE_URL=${DATABASE_URL:-postgresql://mlflow:password@host:5432/mlflow}
+        command: mlflow server --backend-store-uri ${DATABASE_URL} --default-artifact-root s3://mlflow/ --serve-artifacts --host 0.0.0.0
 
 volumes:
     dbdata:
