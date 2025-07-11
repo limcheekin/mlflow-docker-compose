@@ -43,8 +43,8 @@ services:
             mc mb minio/mlflow || true &&
             exit 0
         volumes:
-            - ./wait-for-it.sh:/tmp/wait-for-it.sh
-            - ./mlflow-policy.json:/tmp/mlflow-policy.json
+            - /home/limcheekin/docker/volumes/mlflow/wait-for-it.sh:/tmp/wait-for-it.sh
+            - /home/limcheekin/docker/volumes/mlflow/mlflow-policy.json:/tmp/mlflow-policy.json
 
     db:
         restart: always
