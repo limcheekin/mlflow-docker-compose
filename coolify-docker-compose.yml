@@ -30,23 +30,23 @@ services:
             /tmp/wait-for-it.sh "${MINIO_HOST_PORT}" &&
             mc alias set minio "http://${MINIO_HOST_PORT}" "${AWS_ACCESS_KEY_ID}" "${AWS_SECRET_ACCESS_KEY}" &&
             cat << 'EOF' > /tmp/mlflow-policy.json
-            {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                "Effect": "Allow",
-                "Action": [
-                    "s3:PutObject",
-                    "s3:PutObjectAcl",
-                    "s3:GetObject",
-                    "s3:GetObjectAcl",
-                    "s3:DeleteObject"
-                ],
-                "Resource": "arn:aws:s3:::mlflow/*"
-                }
-            ]
-            }
-            EOF &&
+{
+"Version": "2012-10-17",
+"Statement": [
+    {
+    "Effect": "Allow",
+    "Action": [
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:GetObject",
+        "s3:GetObjectAcl",
+        "s3:DeleteObject"
+    ],
+    "Resource": "arn:aws:s3:::mlflow/*"
+    }
+]
+}
+EOF
             mc admin policy create minio mlflow-policy /tmp/mlflow-policy.json || true &&
             mc admin user add minio mlflow-user "${AWS_ACCESS_KEY_ID}" "${MLFLOW_USER_SECRET}" || true &&
             mc admin policy attach minio mlflow-policy --user mlflow-user ||
