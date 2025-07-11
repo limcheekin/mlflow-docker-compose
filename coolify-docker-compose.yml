@@ -33,13 +33,12 @@ services:
             mc admin policy create minio mlflow-policy /tmp/mlflow-policy.json || true &&
 
             # Create the mlflow user if it doesn't exist
-            mc admin user add minio mlflow-user "${AWS_ACCESS_KEY_ID}" "${MLFLOW_USER_SECRET}" || true &&
+            mc admin user add minio mlflow-user "${MLFLOW_USER_SECRET}" || true &&
 
             # Attach the policy to user
             mc admin policy attach minio mlflow-policy --user mlflow-user || true &&
 
             # Make sure the bucket exists
-            mc mb minio/mlflow || true &&
             mc mb minio/mlflow || true &&
             exit 0
         volumes:
