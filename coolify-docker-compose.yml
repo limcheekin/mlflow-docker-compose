@@ -21,12 +21,34 @@ services:
             - minio
         container_name: mc
         environment:
-            - MINIO_HOST_PORT=${MINIO_HOST_PORT:-minio:9000}        
+            - MINIO_HOST_PORT=${MINIO_HOST_PORT:-minio:9000}
+            - MLFLOW_USER_SECRET=${MLFLOW_USER_SECRET}        
         entrypoint: >
             /bin/sh -c "
             /tmp/wait-for-it.sh ${MINIO_HOST_PORT} &&
             /usr/bin/mc alias set minio http://${MINIO_HOST_PORT} ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} &&
-            /usr/bin/mc mb minio/mlflow;
+            cat <<EOF > /tmp/mlflow-policy.json
+            {
+            \"Version\": \"2012-10-17\",
+            \"Statement\": [
+                {
+                \"Effect\": \"Allow\",
+                \"Action\": [
+                    \"s3:PutObject\",
+                    \"s3:PutObjectAcl\",
+                    \"s3:GetObject\",
+                    \"s3:GetObjectAcl\",
+                    \"s3:DeleteObject\"
+                ],
+                \"Resource\": \"arn:aws:s3:::mlflow/*\"
+                }
+            ]
+            }
+            EOF &&
+            /usr/bin/mc admin policy create minio mlflow-policy /tmp/mlflow-policy.json &&
+            /usr/bin/mc admin user add minio mlflow-user ${MLFLOW_USER_SECRET} || true &&
+            /usr/bin/mc admin policy attach minio mlflow-policy --user mlflow-user &&
+            /usr/bin/mc mb minio/mlflow || true &&
             exit 0;
             "
         volumes:
@@ -57,8 +79,8 @@ services:
             - "5000:5000"
         environment:
             - MLFLOW_S3_ENDPOINT_URL=http://${MINIO_HOST_PORT}
-            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_ACCESS_KEY_ID=mlflow-user
+            - AWS_SECRET_ACCESS_KEY=${MLFLOW_USER_SECRET}
             - MYSQL_DATABASE_URL=${MYSQL_DATABASE_URL:-mysql+pymysql://user:password@host:3306/db}
         command: mlflow server --backend-store-uri ${MYSQL_DATABASE_URL} --default-artifact-root s3://mlflow/ --host 0.0.0.0
 
