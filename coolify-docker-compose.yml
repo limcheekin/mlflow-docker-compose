@@ -70,8 +70,10 @@ services:
             - "5000:5000"
         environment:
             - MLFLOW_S3_ENDPOINT_URL=http://${MINIO_HOST_PORT}
+            - MLFLOW_S3_IGNORE_TLS=true # If you're using HTTP or a self-signed certificate with MinIO
             - AWS_ACCESS_KEY_ID=mlflow-user
             - AWS_SECRET_ACCESS_KEY=${MLFLOW_USER_SECRET}
+            - AWS_DEFAULT_REGION=us-east-1
             - MYSQL_DATABASE_URL=${MYSQL_DATABASE_URL:-mysql+pymysql://user:password@host:3306/db}
         command: mlflow server --backend-store-uri ${MYSQL_DATABASE_URL} --default-artifact-root s3://mlflow/ --host 0.0.0.0
 
