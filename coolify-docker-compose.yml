@@ -75,7 +75,7 @@ services:
             - AWS_SECRET_ACCESS_KEY=${MLFLOW_USER_SECRET}
             - AWS_DEFAULT_REGION=us-east-1
             - MYSQL_DATABASE_URL=${MYSQL_DATABASE_URL:-mysql+pymysql://user:password@host:3306/db}
-        command: mlflow server --backend-store-uri ${MYSQL_DATABASE_URL} --default-artifact-root s3://mlflow/ --host 0.0.0.0
+        command: mlflow server --backend-store-uri ${MYSQL_DATABASE_URL} --default-artifact-root s3://mlflow/ --serve-artifacts --host 0.0.0.0
 
 volumes:
     dbdata:
