@@ -55,8 +55,8 @@ services:
         environment:
             - MLFLOW_S3_ENDPOINT_URL=http://${MINIO_HOST_PORT}
             - MLFLOW_S3_IGNORE_TLS=true # If you're using HTTP or a self-signed certificate with MinIO
-            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_ACCESS_KEY_ID=mlflow-user
+            - AWS_SECRET_ACCESS_KEY=${MLFLOW_USER_SECRET}
             - AWS_DEFAULT_REGION=us-east-1
             - DATABASE_URL=${DATABASE_URL:-postgresql://mlflow:password@host:5432/mlflow}
         command: mlflow server --backend-store-uri ${DATABASE_URL} --default-artifact-root s3://mlflow/ --serve-artifacts --host 0.0.0.0
