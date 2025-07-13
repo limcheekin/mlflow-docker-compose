@@ -6,7 +6,7 @@ services:
         image: minio/minio
         container_name: mlflow_s3
         ports:
-        #    - "9000:9000"
+            - "9000:9000"
             - "5001:9001"
         command: server /data --console-address ':9001' --address ':9000'
         environment:
